@@ -11,6 +11,7 @@ def menu():
     if selected_option[0] == "Component":
         listDir("src/app/components")
         dir_path = createOrChooseDirectory("src/app/components")
+        listDir(f"src/app/components/{dir_path}")
         component_name = input("Enter component name: ")
         if component_name == '':
             print("[red]Component name is required")
