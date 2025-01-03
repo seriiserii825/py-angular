@@ -1,6 +1,7 @@
 import os
 from pyfzf import FzfPrompt
 
+from libs.chooseDir import chooseDir
 from libs.listDir import listDir
 from libs.listFiles import listFiles
 from modules.chooseOrCreateDirectory import createOrChooseDirectory
@@ -46,13 +47,14 @@ def menu():
             os.system(command)
             print("[green]Page created")
     elif selected_option[0] == "Service":
-        listDir("src/app/services")
+        listDir("src/app/components")
+        dir_path = chooseDir("src/app/components")
         service_name = input("Enter service name: ")
         if service_name == '':
             print("[red]Service name is required")
             exit()
         else:
-            command = f"ng generate service services/{service_name}"
+            command = f"ng generate service components/{dir_path}/{service_name} --skip-tests"
             os.system(command)
             print("[green]Service created")
     else:
