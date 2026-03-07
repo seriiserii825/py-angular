@@ -49,14 +49,20 @@ def menu():
             os.system(command)
             print("[green]Page created")
     elif selected_option[0] == "Service":
-        listDir("src/app/components")
-        dir_path = chooseDir("src/app/components")
-        service_name = input("Enter service name, like HomeService: ")
+        service_name = input("Enter service name, like Home(HomeService): ")
+        service_name = f"{service_name}Service"
         if service_name == '':
             print("[red]Service name is required")
             exit()
         else:
-            command = f"ng generate service components/{dir_path}/{service_name} --skip-tests"
+            apply_to_component = input("Apply to component? (y/n): ")
+            if apply_to_component.lower() == 'y':
+                listDir("src/app/components")
+                dir_path = chooseDir("src/app/components")
+                dir_path = f"components/{dir_path}"
+            else:
+                dir_path = "services"
+            command = f"ng generate service {dir_path}/{service_name} --skip-tests"
             os.system(command)
             print("[green]Service created")
     else:
