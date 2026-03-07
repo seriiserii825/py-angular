@@ -6,6 +6,8 @@ from libs.listDir import listDir
 from libs.listFiles import listFiles
 from modules.chooseOrCreateDirectory import createOrChooseDirectory
 fzf = FzfPrompt()
+
+
 def menu():
     menu_items = ("Page", "Component", "Model", "Interface", "Service")
     selected_option = fzf.prompt(menu_items)
@@ -14,7 +16,7 @@ def menu():
         listDir("src/app/components")
         dir_path = createOrChooseDirectory("src/app/components")
         listDir(f"src/app/components/{dir_path}")
-        component_name = input("Enter component name: ")
+        component_name = input("Enter component name, like input-field: ")
         if component_name == '':
             print("[red]Component name is required")
             exit()
@@ -38,7 +40,7 @@ def menu():
         if not os.path.exists("src/app/pages"):
             os.makedirs("src/app/pages")
         listDir("src/app/pages")
-        page_name = input("Enter page name: ")
+        page_name = input("Enter page name, like home: ")
         if page_name == '':
             print("[red]Page name is required")
             exit()
@@ -49,7 +51,7 @@ def menu():
     elif selected_option[0] == "Service":
         listDir("src/app/components")
         dir_path = chooseDir("src/app/components")
-        service_name = input("Enter service name: ")
+        service_name = input("Enter service name, like HomeService: ")
         if service_name == '':
             print("[red]Service name is required")
             exit()
@@ -60,5 +62,6 @@ def menu():
     else:
         print("Invalid option")
         exit()
+
 
 menu()
