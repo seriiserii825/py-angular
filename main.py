@@ -1,72 +1,54 @@
 import os
+
 from pyfzf import FzfPrompt
 
-from libs.chooseDir import chooseDir
-from libs.listDir import listDir
-from libs.listFiles import listFiles
-from modules.chooseOrCreateDirectory import createOrChooseDirectory
+from py_libs.Command import Command
+from py_libs.FilesHandle import FilesHandle
+from py_libs.InputValidator import InputValidator
+from py_libs.Print import Print
+
 fzf = FzfPrompt()
 
 
 def menu():
     menu_items = ("Page", "Component", "Model", "Interface", "Service")
     selected_option = fzf.prompt(menu_items)
+    fh = FilesHandle()
 
     if selected_option[0] == "Component":
-        listDir("src/app/components")
-        dir_path = createOrChooseDirectory("src/app/components")
-        listDir(f"src/app/components/{dir_path}")
-        component_name = input("Enter component name, like input-field: ")
-        if component_name == '':
-            print("[red]Component name is required")
-            exit()
-        else:
-            command = f"ng generate component components/{dir_path}/{component_name} -s --skip-tests"
-            os.system(command)
-            print("[green]Component created")
+        selected_path = fh.create_or_choose_directory("src/app/components")
+        fh.list_dir(selected_path)
+        component_name = InputValidator.get_string("Enter component name, like input-field: ")
+        relative_path = os.path.relpath(os.path.abspath(selected_path), os.path.abspath("src/app"))
+        Command.run(f"ng generate component {relative_path}/{component_name} -s --skip-tests")
+        Print.success("Component created")
     elif selected_option[0] == "Interface":
         if not os.path.exists("src/app/interfaces"):
             os.makedirs("src/app/interfaces")
-        listFiles("src/app/interfaces")
-        page_name = input("Enter interface name: ")
-        if page_name == '':
-            print("[red]Page name is required")
-            exit()
-        else:
-            command = f"touch src/app/interfaces/{page_name}.ts"
-            os.system(command)
-            print("[green]Interface created")
+        fh.list_files("src/app/interfaces")
+        page_name = InputValidator.get_string("Enter interface name: ")
+        Command.run(f"touch 'src/app/interfaces/{page_name}.ts'")
+        Print.success("Interface created")
     elif selected_option[0] == "Page":
         if not os.path.exists("src/app/pages"):
             os.makedirs("src/app/pages")
-        listDir("src/app/pages")
-        page_name = input("Enter page name, like home: ")
-        if page_name == '':
-            print("[red]Page name is required")
-            exit()
-        else:
-            command = f"ng generate component pages/{page_name} -s --skip-tests"
-            os.system(command)
-            print("[green]Page created")
+        fh.list_dir("src/app/pages")
+        page_name = InputValidator.get_string("Enter page name, like home: ")
+        Command.run(f"ng generate component pages/{page_name} -s --skip-tests")
+        Print.success("Page created")
     elif selected_option[0] == "Service":
-        service_name = input("Enter service name, like Home(HomeService): ")
+        service_name = InputValidator.get_string("Enter service name, like Home(HomeService): ")
         service_name = f"{service_name}Service"
-        if service_name == '':
-            print("[red]Service name is required")
-            exit()
+        if InputValidator.get_bool("Apply to component? (y/n): "):
+            fh.list_dir("src/app/components")
+            dir_path = fh.choose_dir("src/app/components")
+            dir_path = f"components/{dir_path}"
         else:
-            apply_to_component = input("Apply to component? (y/n): ")
-            if apply_to_component.lower() == 'y':
-                listDir("src/app/components")
-                dir_path = chooseDir("src/app/components")
-                dir_path = f"components/{dir_path}"
-            else:
-                dir_path = "services"
-            command = f"ng generate service {dir_path}/{service_name} --skip-tests"
-            os.system(command)
-            print("[green]Service created")
+            dir_path = "services"
+        Command.run(f"ng generate service {dir_path}/{service_name} --skip-tests")
+        Print.success("Service created")
     else:
-        print("Invalid option")
+        Print.error("Invalid option")
         exit()
 
 
