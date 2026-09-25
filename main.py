@@ -30,11 +30,14 @@ def menu():
         Command.run(f"touch 'src/app/interfaces/{page_name}.ts'")
         Print.success("Interface created")
     elif selected_option[0] == "Page":
-        if not os.path.exists("src/app/pages"):
-            os.makedirs("src/app/pages")
-        fh.list_dir("src/app/pages")
+        fh.draw_tree(fh.ensure_dir("src/app/pages"))
+        selected_path = fh.create_or_choose_directory("src/app/pages")
+        fh.list_dir(selected_path)
         page_name = InputValidator.get_string("Enter page name, like home: ")
-        Command.run(f"ng generate component pages/{page_name} -s --skip-tests")
+        if not page_name.endswith("-page"):
+            page_name = f"{page_name}-page"
+        relative_path = os.path.relpath(os.path.abspath(selected_path), os.path.abspath("src/app"))
+        Command.run(f"ng generate component {relative_path}/{page_name} -s --skip-tests")
         Print.success("Page created")
     elif selected_option[0] == "Service":
         service_name = InputValidator.get_string("Enter service name, like Home(HomeService): ")
