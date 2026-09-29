@@ -33,12 +33,15 @@ def menu():
         fh.draw_tree(fh.ensure_dir("src/app/pages"))
         selected_path = fh.create_or_choose_directory("src/app/pages")
         fh.list_dir(selected_path)
-        page_name = InputValidator.get_string("Enter page name, like home: ")
-        if not page_name.endswith("-page"):
-            page_name = f"{page_name}-page"
+        page_names = InputValidator.get_string("Enter page names separated by comma, like home, about: ")
         relative_path = os.path.relpath(os.path.abspath(selected_path), os.path.abspath("src/app"))
-        Command.run(f"ng generate component {relative_path}/{page_name} -s --skip-tests")
-        Print.success("Page created")
+        for page_name in (name.strip() for name in page_names.split(",")):
+            if not page_name:
+                continue
+            if not page_name.endswith("-page"):
+                page_name = f"{page_name}-page"
+            Command.run(f"ng generate component {relative_path}/{page_name} -s --skip-tests")
+            Print.success(f"Page {page_name} created")
     elif selected_option[0] == "Service":
         service_name = InputValidator.get_string("Enter service name, like Home(HomeService): ")
         service_name = f"{service_name}Service"
